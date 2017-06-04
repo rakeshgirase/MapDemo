@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">MapDemo</string>
     <string name="title_activity_first_maps">Map</string>
+    <string name="whereYouWantToGo">Where do you want to go</string>
+    <string name="map_type_none">None</string>
+    <string name="map_type_normal">Normal</string>
+    <string name="map_type_terrain">Terrain</string>
+    <string name="map_type_satellite">Satellite</string>
+    <string name="map_type_hybrid">Hybrid</string>
 </resources>

@@ -19,11 +19,12 @@ public class FakeLocationSimulator implements LocationSimulator {
         locations.put(City.MUMBAI, new LatLng(19.0760, 72.8777));
         locations.put(City.LONDON, new LatLng(51.5074, 0.1278));
         locations.put(City.NEW_YORK, new LatLng(40.7128, 74.0059));
+        locations.put(City.SURAT, new LatLng(21.1702, 72.8311));
         address.addAll(locations.values());
     }
 
     enum City{
-        MUMBAI, LONDON, NEW_YORK
+        MUMBAI, LONDON, SURAT, NEW_YORK
     }
 
     @Override
@@ -31,6 +32,6 @@ public class FakeLocationSimulator implements LocationSimulator {
         if(count>2){
             count = 0;
         }
-        return address.get(count++);
+        return locations.get(City.SURAT);
     }
 }

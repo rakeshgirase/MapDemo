@@ -13,6 +13,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by rakesh on 27-May-2017.
  */
@@ -32,7 +34,7 @@ public class GPSTracker extends Service implements LocationListener{
     }
 
 
-    public Location getLocation() {
+    public LatLng getLocation() {
         try {
 
             System.err.println("Hello!!");
@@ -41,8 +43,7 @@ public class GPSTracker extends Service implements LocationListener{
             isNetworkEnabled = locationManager.isProviderEnabled(locationManager.NETWORK_PROVIDER);
             System.err.println("isGPSEnabled: " + isGPSEnabled);
             System.err.println("isNetworkEnabled: " + isNetworkEnabled);
-            if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if(hasLocationAccess()){
                 if(isGPSEnabled){
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
                         if(locationManager!=null){
@@ -62,7 +63,12 @@ public class GPSTracker extends Service implements LocationListener{
         }catch (Exception exception){
             exception.printStackTrace();
         }
-        return location;
+        return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    private boolean hasLocationAccess() {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
