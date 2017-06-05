@@ -16,10 +16,10 @@ public class FakeLocationSimulator implements LocationSimulator {
     private int count = 0;
 
     public FakeLocationSimulator() {
+        locations.put(City.SURAT, new LatLng(25.1702, 72.8311));
         locations.put(City.MUMBAI, new LatLng(19.0760, 72.8777));
-        locations.put(City.LONDON, new LatLng(51.5074, 0.1278));
-        locations.put(City.NEW_YORK, new LatLng(40.7128, 74.0059));
-        locations.put(City.SURAT, new LatLng(21.1702, 72.8311));
+        locations.put(City.LONDON, new LatLng(52.5074, 0.1278));
+        locations.put(City.NEW_YORK, new LatLng(46.7128, 74.0059));
         address.addAll(locations.values());
     }
 
@@ -29,9 +29,9 @@ public class FakeLocationSimulator implements LocationSimulator {
 
     @Override
     public LatLng locate() {
-        if(count>2){
+        if(count>locations.size()-1){
             count = 0;
         }
-        return locations.get(City.SURAT);
+        return address.get(count);
     }
 }

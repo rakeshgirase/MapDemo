@@ -4,9 +4,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by rakesh on 26-May-2017.
- */
 public class LocationSimulatorTest {
     @Test
     public void locate() throws Exception {
