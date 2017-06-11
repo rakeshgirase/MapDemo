@@ -1,6 +1,7 @@
 package com.exuberant.maps.mapdemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -85,7 +87,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
             System.err.println("Locating: " + location);
             mGoogleMap.addMarker(new MarkerOptions().position(location).title("Marker : " + location));
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-
         } catch (Exception e) {
             System.err.println("Got Exception locating: " + e.getMessage() + location.latitude + "," + location.longitude);
         }
