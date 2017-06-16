@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static android.R.id.list;
+
 public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleMap mGoogleMap;
@@ -109,17 +111,26 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
         String location = searchText.getText().toString();
 
         Geocoder geocoder = new Geocoder(this);
-        List<Address> list = geocoder.getFromLocationName(location, 1);
-        Address address = list.get(0);
-        String locality = address.getLocality();
+        List<Address> list = null;
+        try{
+            list = geocoder.getFromLocationName(location, 1);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.err.println("Message: " + e.getMessage());
+        }
 
-        Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
+        if (list.size()>0) {
+            Address address = list.get(0);
+            String locality = address.getLocality();
 
-        double lat = address.getLatitude();
-        double lng = address.getLongitude();
-        goToLocationZoom(lat, lng, 15);
+            Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
 
-        setMarker(locality, lat, lng);
+            double lat = address.getLatitude();
+            double lng = address.getLongitude();
+            goToLocationZoom(lat, lng, 15);
+
+            setMarker(locality, lat, lng);
+        }
 
     }
 
@@ -137,7 +148,7 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher))
                 .position(new LatLng(lat, lng))
-                .snippet("I am Here");
+                .snippet("I Found It");
 
         markers.add(mGoogleMap.addMarker(options));
 

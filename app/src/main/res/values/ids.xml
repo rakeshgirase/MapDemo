@@ -5,4 +5,7 @@
     <item name="mapTypeSatellite" type="id">Satellite</item>
     <item name="mapTypeTerrain" type="id">Terrain</item>
     <item name="mapTypeHybrid" type="id">Hybrid</item>
+    <item name="trackable_pic" type="id">trackable_pic</item>
+    <item name="trackable_number" type="id">trackable_number</item>
+    <item name="trackable_city" type="id">trackable_city</item>
 </resources>
