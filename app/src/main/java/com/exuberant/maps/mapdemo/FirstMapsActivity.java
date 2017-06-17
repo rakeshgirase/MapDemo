@@ -19,8 +19,11 @@ import android.widget.Toast;
 //import com.google.android.gms.location.LocationServices;
 
 import com.exuberant.maps.GPSTracker;
+import com.exuberant.maps.model.User;
+import com.exuberant.maps.model.Vehicle;
+import com.exuberant.maps.model.VehicleTracker;
 import com.exuberant.maps.pinner.LocationSimulator;
-import com.exuberant.maps.pinner.LocationSimulatorFactory;
+import com.exuberant.maps.service.ServiceFactory;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
@@ -38,7 +41,9 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -51,13 +56,15 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
     private GPSTracker gpsTracker;
     private LatLng mLocation;
     private ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-    private LocationSimulator simulator = LocationSimulatorFactory.getSimulator();
+    private LocationSimulator simulator = ServiceFactory.locationSimulator();
     private GoogleApiClient mGoogleApiClient;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_maps);
+        this.user = new User("Rakesh");
         gpsTracker = new GPSTracker(getApplicationContext());
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -77,9 +84,17 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         this.mGoogleMap = googleMap;
         mLocation = gpsTracker.getLocation();
-        Marker currentLocationMarker = this.mGoogleMap.addMarker(new MarkerOptions().position(mLocation).title("I am here!!!"));
+        Collection<VehicleTracker> vehicleTrackers = ServiceFactory.trackerService().trackVehicles(user);
+        for(VehicleTracker vehicleTracker: vehicleTrackers){
+            showVehicle(vehicleTracker);
+        }
+        /*Marker currentLocationMarker = this.mGoogleMap.addMarker(new MarkerOptions().position(mLocation).title("I am here!!!"));
         Marker surat = this.mGoogleMap.addMarker(new MarkerOptions().position(simulator.locate()).title("Marker : SURAT"));
-        this.mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(mLocation));
+        this.mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(mLocation));*/
+    }
+
+    private void showVehicle(VehicleTracker vehicleTracker) {
+        this.mGoogleMap.addMarker(new MarkerOptions().position(vehicleTracker.getLocation()).title(vehicleTracker.getVehicle().toString()));
     }
 
     public void showOnMap() {

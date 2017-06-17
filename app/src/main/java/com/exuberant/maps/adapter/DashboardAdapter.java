@@ -10,21 +10,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.exuberant.maps.mapdemo.R;
+import com.exuberant.maps.model.Dashboard;
 import com.exuberant.maps.model.DashboardRow;
+import com.exuberant.maps.service.DashboardService;
+import com.exuberant.maps.service.ServiceFactory;
 
 import java.util.List;
 
+import static android.media.CamcorderProfile.get;
+
 public class DashboardAdapter extends BaseAdapter {
 
+    private final Dashboard dashboard;
     private Context context;
-    private List<DashboardRow> dashboardRows;
 
-    public DashboardAdapter(Context context, List<DashboardRow> dashboardRows) {
+    public DashboardAdapter(Context context, Dashboard dashboard) {
         this.context = context;
-        this.dashboardRows = dashboardRows;
+        this.dashboard = dashboard;
     }
 
-    private class ViewHolder{
+    private class ViewHolder {
         ImageView pic;
         TextView number;
         TextView city;
@@ -33,17 +38,17 @@ public class DashboardAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return dashboardRows.size();
+        return dashboard.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return dashboardRows.get(position);
+        return dashboard.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return dashboardRows.indexOf(getItem(position));
+        return dashboard.getItemId(position);
     }
 
     @Override
@@ -51,14 +56,14 @@ public class DashboardAdapter extends BaseAdapter {
         ViewHolder viewHolder;
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        if(convertView==null){
+        if (convertView == null) {
             convertView = mInflater.inflate(R.layout.trackable, null);
             viewHolder = new ViewHolder();
             viewHolder.pic = (ImageView) convertView.findViewById(R.id.trackable_pic);
             viewHolder.number = (TextView) convertView.findViewById(R.id.trackable_number);
             viewHolder.city = (TextView) convertView.findViewById(R.id.trackable_city);
 
-            DashboardRow row = dashboardRows.get(position);
+            DashboardRow row = dashboard.get(position);
             viewHolder.pic.setImageResource(row.getPicAsResource());
             viewHolder.city.setText(row.getCity());
             viewHolder.number.setText(row.getNumber());

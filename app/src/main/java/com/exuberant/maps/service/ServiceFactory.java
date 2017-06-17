@@ -7,18 +7,39 @@ import com.exuberant.maps.service.persistence.PersistenceService;
 
 public class ServiceFactory {
 
+    private static FakeTrackerService fakeTrackerService;
+    private static CachePersistenceService cachePersistenceService;
+    private static FakeLocationSimulator fakeLocationSimulator;
+    private static DashboardService dashboardService;
+
     private ServiceFactory(){}
 
     public static TrackerService trackerService(){
-        return new FakeTrackerService(persistenceService());
+        if(fakeTrackerService==null){
+            fakeTrackerService = new FakeTrackerService(persistenceService());
+        }
+        return fakeTrackerService;
     }
 
-    private static PersistenceService persistenceService() {
-        return new CachePersistenceService(locationSimulator());
+    public static PersistenceService persistenceService() {
+        if (cachePersistenceService==null) {
+            cachePersistenceService = new CachePersistenceService(locationSimulator());
+        }
+        return cachePersistenceService;
     }
 
-    private static LocationSimulator locationSimulator() {
-        return new FakeLocationSimulator();
+    public static LocationSimulator locationSimulator() {
+        if (fakeLocationSimulator==null) {
+            fakeLocationSimulator = new FakeLocationSimulator();
+        }
+        return fakeLocationSimulator;
+    }
+
+    public static DashboardService dashboardService(){
+        if(dashboardService==null){
+            dashboardService = new FakeDashboardService();
+        }
+        return dashboardService;
     }
 
 }

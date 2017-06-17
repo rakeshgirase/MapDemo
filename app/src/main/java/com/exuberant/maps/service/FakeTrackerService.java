@@ -2,12 +2,12 @@ package com.exuberant.maps.service;
 
 import com.exuberant.maps.model.User;
 import com.exuberant.maps.model.Vehicle;
+import com.exuberant.maps.model.VehicleTracker;
 import com.exuberant.maps.service.persistence.PersistenceService;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by rakesh on 10-Jun-2017.
@@ -22,17 +22,22 @@ public class FakeTrackerService implements TrackerService {
     }
 
     @Override
-    public Set<Vehicle> getVehicles(User user) {
+    public Collection<Vehicle> getVehicles(User user) {
         return persistenceService.getVehicles(user);
     }
 
     @Override
-    public LatLng getLocation(User user, Vehicle vehicle) {
-        return persistenceService.getLocation(user, vehicle);
+    public VehicleTracker getLocation(User user, Vehicle vehicle) {
+        return persistenceService.trackVehicle(user, vehicle);
     }
 
     @Override
-    public List<LatLng> getPathForDuration(User user, Vehicle vehicle, Date startDate, Date endDate) {
+    public Collection<VehicleTracker> trackVehicles(User user) {
+        return persistenceService.trackVehicles(user);
+    }
+
+    @Override
+    public Collection<LatLng> getPathForDuration(User user, Vehicle vehicle, Date startDate, Date endDate) {
         return null;
     }
 }

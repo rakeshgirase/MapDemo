@@ -2,8 +2,10 @@ package com.exuberant.maps.service.persistence;
 
 import com.exuberant.maps.model.User;
 import com.exuberant.maps.model.Vehicle;
+import com.exuberant.maps.model.VehicleTracker;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -14,5 +16,7 @@ import java.util.Set;
 public interface PersistenceService {
     Set<Vehicle> getVehicles(User user);
 
-    LatLng getLocation(User user, Vehicle vehicle);
+    VehicleTracker trackVehicle(User user, Vehicle vehicle);
+
+    Collection<VehicleTracker> trackVehicles(User user);
 }

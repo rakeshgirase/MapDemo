@@ -10,7 +10,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.exuberant.maps.adapter.DashboardAdapter;
+import com.exuberant.maps.model.Dashboard;
 import com.exuberant.maps.model.DashboardRow;
+import com.exuberant.maps.service.DashboardService;
+import com.exuberant.maps.service.ServiceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +25,16 @@ public class DashboardActivity extends AppCompatActivity implements AdapterView.
 
     private  ArrayAdapter<String> adapter;
 
-    private List<DashboardRow> dashboardRows;
     private ListView trackables;
-
+    private Dashboard dashboard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        dashboardRows = new ArrayList<>();
-        dashboardRows.add(new DashboardRow("PIC1", "MUMBAI", "MH0100"));
-        dashboardRows.add(new DashboardRow("PIC2", "SURAT", "MH0200"));
-        dashboardRows.add(new DashboardRow("PIC3", "GOA", "MH0300"));
-        DashboardAdapter dashboardAdapter = new DashboardAdapter(getApplicationContext(), dashboardRows);
+        DashboardService dashboardService = ServiceFactory.dashboardService();
+        dashboard = dashboardService.fetchQuickDashboard();
+        DashboardAdapter dashboardAdapter = new DashboardAdapter(getApplicationContext(), dashboard);
         trackables = (ListView) findViewById(R.id.trackables);
         trackables.setAdapter(dashboardAdapter);
         trackables.setOnItemClickListener(this);
@@ -42,15 +42,10 @@ public class DashboardActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String city = dashboardRows.get(position).getCity();
+        String city = dashboard.get(position).getCity();
         Toast.makeText(getApplicationContext(), city, Toast.LENGTH_SHORT).show();
         Intent myIntent = new Intent(DashboardActivity.this, FirstMapsActivity.class);
-        myIntent.putExtra("key", value); //Optional parameters
-        try {
-            DashboardActivity.this.startActivity(myIntent);
-        } catch (Exception e) {
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-        }
+        //myIntent.putExtra("key", value); //Optional parameters
+        DashboardActivity.this.startActivity(myIntent);
     }
 }

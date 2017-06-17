@@ -4,15 +4,21 @@ import com.exuberant.maps.mapdemo.R;
 
 public class DashboardRow {
 
+    private Long id;
     private String number;
     private String city;
     private String pic;
     private int picAsResource;
 
-    public DashboardRow(String number, String city, String pic) {
+    public DashboardRow(Long id, String number, String city, String pic) {
+        this.id = id;
         this.number = number;
         this.city = city;
         this.pic = pic;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNumber() {
