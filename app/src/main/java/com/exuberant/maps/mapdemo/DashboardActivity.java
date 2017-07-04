@@ -23,7 +23,7 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class DashboardActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private  ArrayAdapter<String> adapter;
+    private ArrayAdapter<String> adapter;
 
     private ListView trackables;
     private Dashboard dashboard;
@@ -44,7 +44,12 @@ public class DashboardActivity extends AppCompatActivity implements AdapterView.
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String city = dashboard.get(position).getCity();
         Toast.makeText(getApplicationContext(), city, Toast.LENGTH_SHORT).show();
-        Intent myIntent = new Intent(DashboardActivity.this, FirstMapsActivity.class);
+        Intent myIntent;
+        if(id%2==0){
+            myIntent = new Intent(DashboardActivity.this, FirstMapsActivity.class);
+        }else{
+            myIntent = new Intent(DashboardActivity.this, MainActivity.class);
+        }
         //myIntent.putExtra("key", value); //Optional parameters
         DashboardActivity.this.startActivity(myIntent);
     }

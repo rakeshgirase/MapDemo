@@ -26,5 +26,4 @@ public interface TrackerService {
     Collection<LatLng> getPathForDuration(User user, Vehicle vehicle, Date startDate, Date endDate);
 
 
-
 }

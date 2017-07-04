@@ -45,10 +45,10 @@ public class CachePersistenceService implements PersistenceService {
     @Override
     public VehicleTracker trackVehicle(User user, Vehicle vehicle) {
         VehicleTracker tracker;
-        if(getVehicles(user).contains(vehicle)){
+        if (getVehicles(user).contains(vehicle)) {
             LatLng location = locationSimulator.locate(vehicle);
             tracker = new VehicleTracker(vehicle, location);
-        }else{
+        } else {
             throw new InvalidInputException("Register vehicle for the user!!!");
         }
         return tracker;
@@ -57,7 +57,7 @@ public class CachePersistenceService implements PersistenceService {
     @Override
     public Collection<VehicleTracker> trackVehicles(final User user) {
         Collection<VehicleTracker> result = new HashSet<>();
-        for (Vehicle vehicle:getVehicles(user)) {
+        for (Vehicle vehicle : getVehicles(user)) {
             result.add(trackVehicle(user, vehicle));
         }
         return result;

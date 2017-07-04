@@ -1,7 +1,6 @@
 package com.exuberant.maps.mapdemo;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -10,19 +9,18 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-//import com.google.android.gms.location.LocationServices;
 
 import com.exuberant.maps.GPSTracker;
 import com.exuberant.maps.model.User;
-import com.exuberant.maps.model.Vehicle;
 import com.exuberant.maps.model.VehicleTracker;
-import com.exuberant.maps.pinner.LocationSimulator;
 import com.exuberant.maps.service.ServiceFactory;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,6 +30,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -40,25 +39,20 @@ import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static android.R.id.list;
 
 public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleMap mGoogleMap;
 
     private GPSTracker gpsTracker;
-    private LatLng mLocation;
-    private ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-    private LocationSimulator simulator = ServiceFactory.locationSimulator();
-    private GoogleApiClient mGoogleApiClient;
     private User user;
+
+    List<Marker> markers = new ArrayList<>();
+    static final int POLYGON_POINTS = 5;
+
+    Polygon shape;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +60,7 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
         setContentView(R.layout.activity_first_maps);
         this.user = new User("Rakesh");
         gpsTracker = new GPSTracker(getApplicationContext());
+        ServiceFactory.initializeGeoCoder(getApplicationContext());
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -82,31 +77,42 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        this.mGoogleMap = googleMap;
-        mLocation = gpsTracker.getLocation();
+        mGoogleMap = googleMap;
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            mGoogleMap.setMyLocationEnabled(true);
+        }
+        fetchVehiclesAndShowThemOnMap();
+        //FIXME: Fix the Animation
+        /*Animator animator = new Animator(mGoogleMap, markers);
+        animator.startAnimation(true);*/
+    }
+
+    public CameraPosition.Builder getIdealCameraPositionBuilder() {
+        return new CameraPosition.Builder()
+                .zoom(16.5f)
+                .bearing(0)
+                .tilt(25);
+    }
+
+    private void fetchVehiclesAndShowThemOnMap() {
         Collection<VehicleTracker> vehicleTrackers = ServiceFactory.trackerService().trackVehicles(user);
-        for(VehicleTracker vehicleTracker: vehicleTrackers){
+        for (VehicleTracker vehicleTracker : vehicleTrackers) {
             showVehicle(vehicleTracker);
         }
-        /*Marker currentLocationMarker = this.mGoogleMap.addMarker(new MarkerOptions().position(mLocation).title("I am here!!!"));
-        Marker surat = this.mGoogleMap.addMarker(new MarkerOptions().position(simulator.locate()).title("Marker : SURAT"));
-        this.mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(mLocation));*/
+        CameraPosition cameraPosition = this.getIdealCameraPositionBuilder().target(vehicleTrackers.iterator().next().getLocation()).build();
+        mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     private void showVehicle(VehicleTracker vehicleTracker) {
-        this.mGoogleMap.addMarker(new MarkerOptions().position(vehicleTracker.getLocation()).title(vehicleTracker.getVehicle().toString()));
-    }
-
-    public void showOnMap() {
-
-        LatLng location = simulator.locate();
-        try {
-            System.err.println("Locating: " + location);
-            mGoogleMap.addMarker(new MarkerOptions().position(location).title("Marker : " + location));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        } catch (Exception e) {
-            System.err.println("Got Exception locating: " + e.getMessage() + location.latitude + "," + location.longitude);
-        }
+        markers.add(this.mGoogleMap.addMarker(new MarkerOptions().position(vehicleTracker.getLocation()).title(vehicleTracker.getVehicle().toString())));
     }
 
     private void goToLocationZoom(double lat, double lng, float zoom) {
@@ -115,11 +121,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
         mGoogleMap.moveCamera(update);
     }
 
-    ArrayList<Marker> markers = new ArrayList<Marker>();
-    static final int POLYGON_POINTS = 5;
-
-    Polygon shape;
-
     public void geoLocate(View view) throws IOException {
 
         EditText searchText = (EditText) findViewById(R.id.editText);
@@ -127,14 +128,14 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
 
         Geocoder geocoder = new Geocoder(this);
         List<Address> list = null;
-        try{
+        try {
             list = geocoder.getFromLocationName(location, 1);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Message: " + e.getMessage());
         }
 
-        if (list.size()>0) {
+        if (list.size() > 0) {
             Address address = list.get(0);
             String locality = address.getLocality();
 
@@ -150,9 +151,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void setMarker(String locality, double lat, double lng) {
-//        if(marker != null){
-//            removeEverything();
-//        }
 
         if (markers.size() == POLYGON_POINTS) {
             removeEverything();
@@ -170,18 +168,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
         if (markers.size() == POLYGON_POINTS) {
             drawPolygon();
         }
-        //if(marker1 == null) {
-//            marker1 = mGoogleMap.addMarker(options);
-//        } else if(marker2 == null) {
-//            marker2 = mGoogleMap.addMarker(options);
-//            drawLine();
-//        } else {
-//            removeEverything();
-//            marker1 = mGoogleMap.addMarker(options);
-//        }
-
-//        circle = drawCircle(new LatLng(lat, lng));
-
     }
 
 
@@ -205,7 +191,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
         markers.clear();
         shape.remove();
         shape = null;
-
     }
 
     @Override
@@ -235,7 +220,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
             default:
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -257,17 +241,6 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
                 return;
             }
         }
-        //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -279,6 +252,11 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, 15);
             mGoogleMap.animateCamera(update);
         }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
     @Override
@@ -296,4 +274,8 @@ public class FirstMapsActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

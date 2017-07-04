@@ -6,7 +6,7 @@ import com.exuberant.maps.model.DashboardRow;
 public class FakeDashboardService implements DashboardService {
 
     @Override
-    public Dashboard fetchQuickDashboard(){
+    public Dashboard fetchQuickDashboard() {
         Dashboard dashboard = new Dashboard();
         dashboard.addItem(new DashboardRow(1L, "PIC1", "MUMBAI", "MH0100"));
         dashboard.addItem(new DashboardRow(2L, "PIC2", "SURAT", "MH0200"));

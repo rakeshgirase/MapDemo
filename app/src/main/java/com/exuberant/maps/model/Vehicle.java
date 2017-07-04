@@ -6,8 +6,6 @@ package com.exuberant.maps.model;
 
 public class Vehicle {
 
-    private VehicleNumber vehicleNumber;
-
     private String number;
 
     public Vehicle(String number) {

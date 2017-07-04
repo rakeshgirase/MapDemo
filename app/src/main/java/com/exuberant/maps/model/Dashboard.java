@@ -23,7 +23,7 @@ public class Dashboard {
         return items;
     }
 
-    public int size(){
+    public int size() {
         return items.size();
     }
 

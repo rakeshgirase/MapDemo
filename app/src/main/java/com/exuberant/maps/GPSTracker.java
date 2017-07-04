@@ -13,13 +13,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
+import com.exuberant.maps.service.ServiceFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by rakesh on 27-May-2017.
  */
 
-public class GPSTracker extends Service implements LocationListener{
+public class GPSTracker extends Service implements LocationListener {
 
     private final Context context;
 
@@ -29,6 +30,7 @@ public class GPSTracker extends Service implements LocationListener{
 
     private Location location;
     protected LocationManager locationManager;
+
     public GPSTracker(Context context) {
         this.context = context;
     }
@@ -43,27 +45,33 @@ public class GPSTracker extends Service implements LocationListener{
             isNetworkEnabled = locationManager.isProviderEnabled(locationManager.NETWORK_PROVIDER);
             System.err.println("isGPSEnabled: " + isGPSEnabled);
             System.err.println("isNetworkEnabled: " + isNetworkEnabled);
-            if(hasLocationAccess()){
-                if(isGPSEnabled){
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
-                        if(locationManager!=null){
-                            System.err.println("Fetching from GPS!!!");
-                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        }
+            if (hasLocationAccess()) {
+                if (isGPSEnabled) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, this);
+                    if (locationManager != null) {
+                        System.err.println("Fetching from GPS!!!");
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
                 }
                 //If Location is not found thenn fetch it from network
-                if(location==null && isNetworkEnabled){
-                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000,10, this);
-                        if(locationManager!=null){
-                            System.err.println("Fetching from Network!!!");
-                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        }
+                if (location == null && isNetworkEnabled) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, this);
+                    if (locationManager != null) {
+                        System.err.println("Fetching from Network!!!");
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    }
                 }
             }
-        }catch (Exception exception){
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng latLng = null;
+        if (location == null) {
+            latLng = ServiceFactory.locationSimulator().locate();
+        } else {
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+        return latLng;
     }
 
     private boolean hasLocationAccess() {
